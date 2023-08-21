@@ -191,32 +191,47 @@ void AutowareBagRecorderNode::generic_subscription_callback(
   const std::shared_ptr<rclcpp::SerializedMessage const> & msg, const std::string & topic_name,
   autoware_bag_recorder::ModuleSection & section)
 {
-  if (gate_mode_msg_ptr) {
-    if (
-      !enable_only_auto_mode_recording_ ||
-      (gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO && is_writing_)) {
-      auto serialized_bag_msg = std::make_shared<rosbag2_storage::SerializedBagMessage>();
-      serialized_bag_msg->serialized_data = std::make_shared<rcutils_uint8_array_t>();
-      serialized_bag_msg->topic_name = topic_name;
-      serialized_bag_msg->time_stamp = node_->now().nanoseconds();
-      serialized_bag_msg->serialized_data->buffer = msg->get_rcl_serialized_message().buffer;
-      serialized_bag_msg->serialized_data->buffer_length =
-        msg->get_rcl_serialized_message().buffer_length;
-      serialized_bag_msg->serialized_data->buffer_capacity =
-        msg->get_rcl_serialized_message().buffer_capacity;
-      serialized_bag_msg->serialized_data->allocator = msg->get_rcl_serialized_message().allocator;
+  // check autoware mode is arrived or not
+  if (!gate_mode_msg_ptr) {
+    return;
+  }
+  if (
+    !enable_only_auto_mode_recording_ ||
+    (gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO && is_writing_)) {
+    auto serialized_bag_msg = std::make_shared<rosbag2_storage::SerializedBagMessage>();
+    serialized_bag_msg->serialized_data = std::make_shared<rcutils_uint8_array_t>();
+    serialized_bag_msg->topic_name = topic_name;
+    serialized_bag_msg->time_stamp = node_->now().nanoseconds();
+    serialized_bag_msg->serialized_data->buffer = msg->get_rcl_serialized_message().buffer;
+    serialized_bag_msg->serialized_data->buffer_length =
+      msg->get_rcl_serialized_message().buffer_length;
+    serialized_bag_msg->serialized_data->buffer_capacity =
+      msg->get_rcl_serialized_message().buffer_capacity;
+    serialized_bag_msg->serialized_data->allocator = msg->get_rcl_serialized_message().allocator;
 
-      std::lock_guard<std::mutex> lock(writer_mutex_);
-      section.bag_writer->write(serialized_bag_msg);
-    }
+    std::lock_guard<std::mutex> lock(writer_mutex_);
+    section.bag_writer->write(serialized_bag_msg);
+  }
+}
+
+void AutowareBagRecorderNode::rotate_topic_names(autoware_bag_recorder::ModuleSection & section)
+{
+  if (!section.topic_names.empty()) {
+    std::rotate(
+      section.topic_names.rbegin(), section.topic_names.rbegin() + 1, section.topic_names.rend());
   }
 }
 
 void AutowareBagRecorderNode::search_topic(autoware_bag_recorder::ModuleSection & section)
 {
+  if (section.topic_names.empty()) {
+    return;
+  }
+
   std::string topic_name = section.topic_names.front();
   auto topic_info_map = node_->get_topic_names_and_types();
   std::string topic_type;
+
   for (const auto & topic_info : topic_info_map) {
     if (topic_info.first == topic_name) {
       topic_type = topic_info.second[0];
@@ -226,17 +241,16 @@ void AutowareBagRecorderNode::search_topic(autoware_bag_recorder::ModuleSection 
 
   if (!topic_type.empty()) {
     add_topics_to_writer(section.bag_writer, topic_name, topic_type);
-
     auto topics_interface = node_->get_node_topics_interface();
     RCLCPP_INFO(
       get_logger(), "Subscribed topic %s of type %s", topic_name.c_str(), topic_type.c_str());
+
     auto subscription = rclcpp::create_generic_subscription(
       topics_interface, topic_name, topic_type, get_qos_profile_of_topic(topic_name),
       [this, topic_name, &section](const std::shared_ptr<rclcpp::SerializedMessage const> & msg) {
         generic_subscription_callback(msg, topic_name, section);
       });
 
-    // write_bag_message(section, topic_name);
     subscriptions_.push_back(subscription);
     remaining_topic_num_ = remaining_topic_num_ - 1;
 
@@ -245,12 +259,10 @@ void AutowareBagRecorderNode::search_topic(autoware_bag_recorder::ModuleSection 
         topic_info.topic_type = topic_type;
       }
     }
+
     section.topic_names.erase(section.topic_names.begin());
   } else {
-    if (!section.topic_names.empty()) {
-      std::rotate(
-        section.topic_names.rbegin(), section.topic_names.rbegin() + 1, section.topic_names.rend());
-    }
+    rotate_topic_names(section);
   }
 }
 
@@ -373,15 +385,16 @@ void AutowareBagRecorderNode::check_bag_time(
 
 void AutowareBagRecorderNode::check_auto_mode()
 {
-  if (gate_mode_msg_ptr) {
-    if (
-      enable_only_auto_mode_recording_ && !is_writing_ &&
-      gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO) {
-      is_writing_ = true;
-      bag_file_handler();
-    }
-  } else {
+  if (!gate_mode_msg_ptr) {
     RCLCPP_WARN(get_logger(), "The current gate mode not received!");
+    return;
+  }
+
+  if (
+    enable_only_auto_mode_recording_ && !is_writing_ &&
+    gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO) {
+    is_writing_ = true;
+    bag_file_handler();
   }
 }
 

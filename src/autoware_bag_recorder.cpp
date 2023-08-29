@@ -395,7 +395,8 @@ void AutowareBagRecorderNode::check_disk_space()
     disk_space_handler();
   }
 
-  if (get_root_disk_space() < maximum_allowed_bag_storage_size_) {
+  if (get_bag_path_directory_size(std::filesystem::u8path(bag_path_))
+      < maximum_allowed_bag_storage_size_) {
     disk_space_handler();
   }
 }

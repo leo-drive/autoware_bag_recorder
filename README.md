@@ -26,7 +26,7 @@ The `autoware_bag_recorder` package does not produce any output topics.
 Here are the core parameters that can be configured for the `autoware_bag_recorder` package:
 
 | Name                               | Type   | Default Value | Description                                                           |
-| ---------------------------------- | ------ |---------------| --------------------------------------------------------------------- |
+| ---------------------------------- | ------ | ------------- | --------------------------------------------------------------------- |
 | `database_storage`                 | string | `"sqlite3"`   | Choose between `"sqlite3"` or `"mcap"` for database storage options.  |
 | `maximum_record_time`              | int    | 1800          | Maximum duration (in seconds) for recording bag files.                |
 | `maximum_allowed_bag_storage_size` | int    | 500.0         | Maximum allowed size (in GB) for storing bag files.                   |
@@ -40,8 +40,4 @@ Here are the core parameters that can be configured for the `autoware_bag_record
 
 ## Assumptions / Known Limits
 
-_(You can add any assumptions or known limits here)_
-
 ## References/External Links
-
-_(You can include any relevant references or external links here)_

@@ -63,12 +63,14 @@ private:
   void setup_single_module(
     const std::string & module_param, std::vector<std::string> & topics,
     const std::string & section_name);
-  void record_all_topics_in_a_bag();
+  void setup_all_module_topics();
   void check_and_remove_files_at_init();
   void initialize_bag_files_for_topics();
   void start_topic_search();
   void start_status_control();
   void disk_space_handler();
+  bool is_bag_folder_limit_reached();
+  bool is_acceptable_disk_limit_reached();
   void check_disk_space();
   void check_record_time(
     const std::chrono::time_point<std::chrono::system_clock> & start_record_time);
@@ -128,6 +130,7 @@ private:
   std::vector<std::string> sensing_topics_;
   std::vector<std::string> system_topics_;
   std::vector<std::string> vehicle_topics_;
+  std::vector<std::string> all_topics_;
 
   std::vector<ModuleSection> module_sections_;
 

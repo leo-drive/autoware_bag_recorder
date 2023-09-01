@@ -24,6 +24,7 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
   // common params declarations
   database_storage_ = declare_parameter<std::string>("common.database_storage");
   bag_path_ = declare_parameter<std::string>("common.path");
+  prefix_ = declare_parameter<std::string>("common.prefix");
   minimum_acceptable_disk_space_ =
     static_cast<int>(declare_parameter<int>("common.minimum_acceptable_disk_space"));
   maximum_record_time_ = static_cast<int>(declare_parameter<int>("common.maximum_record_time"));
@@ -33,7 +34,6 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
     static_cast<double>(declare_parameter<double>("common.maximum_allowed_bag_storage_size"));
   number_of_maximum_bags_ =
     static_cast<int>(declare_parameter<int>("common.number_of_maximum_bags"));
-  record_all_topic_in_a_bag_ = declare_parameter<bool>("common.record_all_topic_in_a_bag");
   enable_only_auto_mode_recording_ =
     declare_parameter<bool>("common.enable_only_auto_mode_recording");
   disk_space_action_mode_ = declare_parameter<std::string>("common.disk_space_threshold_action");
@@ -60,17 +60,8 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
 
 void AutowareBagRecorderNode::setup_module_sections()
 {
-  setup_single_module("api_modules", api_topics_, "api");
-  setup_single_module("autoware_modules", autoware_topics_, "autoware");
-  setup_single_module("control_modules", control_topics_, "control");
-  setup_single_module("external_modules", external_topics_, "external");
-  setup_single_module("localization_modules", localization_topics_, "localization");
-  setup_single_module("map_modules", map_topics_, "map");
-  setup_single_module("perception_modules", perception_topics_, "perception");
-  setup_single_module("planning_modules", planning_topics_, "planning");
-  setup_single_module("sensing_modules", sensing_topics_, "sensing");
-  setup_single_module("system_modules", system_topics_, "system");
-  setup_single_module("vehicle_modules", vehicle_topics_, "vehicle");
+  setup_single_module("raw_input_topics", raw_input_topics_, "raw_input");
+  setup_single_module("other_topics", other_topics_, "other");
 }
 
 void AutowareBagRecorderNode::setup_single_module(
@@ -81,21 +72,13 @@ void AutowareBagRecorderNode::setup_single_module(
   bool record_module_topics = declare_parameter<bool>(module_param + ".record_" + section_name);
   if (record_module_topics) {
     topics = declare_parameter<std::vector<std::string>>(topics_parameter_name);
-    section_factory(topics, bag_path_ + section_name);
     all_topics_.insert(all_topics_.end(), topics.begin(), topics.end());
-  }
-
-  if (record_all_topic_in_a_bag_ && !has_parameter(topics_parameter_name)) {
-    const auto section_topics = declare_parameter<std::vector<std::string>>(topics_parameter_name);
-    all_topics_.insert(all_topics_.end(), section_topics.begin(), section_topics.end());
   }
 }
 
 void AutowareBagRecorderNode::setup_all_module_topics()
 {
-  if (record_all_topic_in_a_bag_) {
-    section_factory(all_topics_, bag_path_ + "all");
-  }
+  section_factory(all_topics_, bag_path_);
 }
 
 void AutowareBagRecorderNode::check_and_remove_files_at_init()
@@ -133,7 +116,7 @@ void AutowareBagRecorderNode::bag_file_handler(ModuleSection & section)
 {
   remove_remainder_bags_in_folder(section);
   std::lock_guard<std::mutex> lock(writer_mutex_);
-  const auto bag_file_path = section.folder_path + "/rosbag2_" + get_timestamp();
+  const auto bag_file_path = section.folder_path + prefix_ + "_" + get_timestamp();
   create_bag_file(section.bag_writer, bag_file_path);
   section.current_bag_name = bag_file_path;
   // section.bag_names.push_back(bag_file_path);
@@ -348,7 +331,7 @@ void AutowareBagRecorderNode::gate_mode_cmd_callback(
 void AutowareBagRecorderNode::initialize_bag_files_for_topics()
 {
   for (auto & section : module_sections_) {
-    const auto bag_file_path = section.folder_path + "/rosbag2_" + get_timestamp();
+    const auto bag_file_path = section.folder_path + prefix_ + "_" + get_timestamp();
     create_bag_file(section.bag_writer, bag_file_path);
     section.current_bag_name = bag_file_path;
     remaining_topic_num_ = remaining_topic_num_ + static_cast<int>(section.topic_names.size());

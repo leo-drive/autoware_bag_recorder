@@ -112,24 +112,15 @@ private:
   int minimum_acceptable_disk_space_;
   int number_of_maximum_bags_;
   std::string disk_space_action_mode_;
+  std::string prefix_;
 
-  bool record_all_topic_in_a_bag_;
   bool enable_only_auto_mode_recording_;
   bool is_writing_;
 
   int remaining_topic_num_;
 
-  std::vector<std::string> api_topics_;
-  std::vector<std::string> autoware_topics_;
-  std::vector<std::string> control_topics_;
-  std::vector<std::string> external_topics_;
-  std::vector<std::string> localization_topics_;
-  std::vector<std::string> map_topics_;
-  std::vector<std::string> perception_topics_;
-  std::vector<std::string> planning_topics_;
-  std::vector<std::string> sensing_topics_;
-  std::vector<std::string> system_topics_;
-  std::vector<std::string> vehicle_topics_;
+  std::vector<std::string> raw_input_topics_;
+  std::vector<std::string> other_topics_;
   std::vector<std::string> all_topics_;
 
   std::vector<ModuleSection> module_sections_;

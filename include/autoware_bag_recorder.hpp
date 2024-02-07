@@ -34,6 +34,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <regex>
 
 namespace autoware_bag_recorder
 {
@@ -102,6 +103,7 @@ private:
     autoware_bag_recorder::ModuleSection & section, std::vector<std::string> & directories);
   void gate_mode_cmd_callback(const tier4_control_msgs::msg::GateMode::ConstSharedPtr msg);
   void run();
+  std::vector<std::string> collect_topics(const std::vector<std::string> &topic_name);
 
   // parameters
   int maximum_record_time_;

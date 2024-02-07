@@ -46,12 +46,6 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
     "/control/current_gate_mode", 1,
     std::bind(&AutowareBagRecorderNode::gate_mode_cmd_callback, this, std::placeholders::_1));
 
-  // initialize module sections
-  setup_module_sections();
-
-  // check recording all topics in a single bag file is enabled
-  setup_all_module_topics();
-
   // Check the files at initialization
   check_and_remove_files_at_init();
 
@@ -72,7 +66,8 @@ void AutowareBagRecorderNode::setup_single_module(
   bool record_module_topics = declare_parameter<bool>(module_param + ".record_" + section_name);
   if (record_module_topics) {
     topics = declare_parameter<std::vector<std::string>>(topics_parameter_name);
-    all_topics_.insert(all_topics_.end(), topics.begin(), topics.end());
+    const auto topic_set = collect_topics(topics);
+    all_topics_.insert(all_topics_.end(), topic_set.begin(), topic_set.end());
   }
 }
 
@@ -464,6 +459,22 @@ void AutowareBagRecorderNode::start_status_control()
 
 void AutowareBagRecorderNode::run()
 {
+
+  // Spin the node to discover the topics
+  rclcpp::Rate r(100);
+  int i = 0;
+  while (rclcpp::ok() && i < 100) {
+    rclcpp::spin_some(node_);
+    r.sleep();
+    i++;
+  }
+
+  // initialize module sections
+  setup_module_sections();
+
+  // check recording all topics in a single bag file is enabled
+  setup_all_module_topics();
+
   // initialize bag files and topics according to the parameters
   initialize_bag_files_for_topics();
 
@@ -472,6 +483,23 @@ void AutowareBagRecorderNode::run()
 
   // starting condition checking thread
   start_status_control();
+}
+std::vector<std::string> AutowareBagRecorderNode::collect_topics(const std::vector<std::string> &topic_name)
+{
+
+  std::vector<std::string> vector_topics;
+  // Read all active topics
+  auto active_topics = node_->get_topic_names_and_types();
+  // Iterate over topic list parameters to find their matches
+  for(const auto & topic: topic_name){
+    std::regex regex_topic_name(topic);
+    for(const auto &active_topic : active_topics){
+      if (std::regex_search(active_topic.first, regex_topic_name)) {
+        vector_topics.push_back(active_topic.first);
+      }
+    }
+  }
+  return vector_topics;
 }
 
 }  // namespace autoware_bag_recorder

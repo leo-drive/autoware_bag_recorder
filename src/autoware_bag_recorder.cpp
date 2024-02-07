@@ -109,6 +109,7 @@ void AutowareBagRecorderNode::create_bag_file(
   rosbag2_storage::StorageOptions storage_options_new;
   storage_options_new.uri = bag_path;
   storage_options_new.storage_id = database_storage_;
+  storage_options_new.max_bagfile_duration = 60;
   writer->open(storage_options_new);
 }
 

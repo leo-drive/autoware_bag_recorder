@@ -4,7 +4,7 @@
       database_storage: "sqlite3"                  # sqlite3 or mcap
       maximum_record_time: 36000                   # seconds
       maximum_allowed_bag_storage_size: 500.0      # GB
-      use_max_bag_file_size: true
+      use_max_bag_file_size: false
       maximum_bag_file_size: 3.0                   # GB
       enable_only_auto_mode_recording: true        # if enabled, recording occurs only "AUTO" mode
       record_all_topic_in_a_bag: true              # creates single bag file with input and other topics

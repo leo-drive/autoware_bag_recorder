@@ -25,18 +25,19 @@ The `autoware_bag_recorder` package does not produce any output topics.
 
 Here are the core parameters that can be configured for the `autoware_bag_recorder` package:
 
-| Name                               | Type   | Default Value        | Description                                                           |
-|------------------------------------| ------ |----------------------|-----------------------------------------------------------------------|
-| `database_storage`                 | string | `"sqlite3"`          | Choose between `"sqlite3"` or `"mcap"` for database storage options.  |
-| `maximum_record_time`              | int    | 36000                | Maximum duration (in seconds) for recording bag files.                |
-| `maximum_allowed_bag_storage_size` | int    | 500.0                | Maximum allowed size (in GB) for storing bag files.                   |
-| `maximum_bag_file_size`            | float  | 20.0                 | Maximum size (in GB) for each individual bag file.                    |
-| `enable_only_auto_mode_recording`  | bool   | false                | If enabled, recording occurs only when the vehicle is in "AUTO" mode. |
-| `number_of_maximum_bags`           | int    | 1000                 | Limit the number of stored bag files.                                 |
-| `path`                             | string | `"bags/"`            | Path where bag files will be saved.                                   |
-| `prefix`                           | string | `"logging_ros2bag_"` | Bag folder name prefix.                                               |
-| `minimum_acceptable_disk_space`    | int    | 10                   | Minimum acceptable disk space (in GB) before taking action.           |
-| `disk_space_threshold_action`      | string | `"shutdown"`         | Choose between `"remove"` or `"shutdown"` for disk space management.  |
+| Name                               | Type   | Default Value        | Description                                                                                                                                                        |
+|------------------------------------|--------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `database_storage`                 | string | `"sqlite3"`          | Choose between `"sqlite3"` or `"mcap"` for database storage options.                                                                                               |
+| `maximum_record_time`              | int    | 36000                | Maximum duration (in seconds) for recording bag files.                                                                                                             |
+| `maximum_allowed_bag_storage_size` | int    | 500.0                | Maximum allowed size (in GB) for storing bag files.                                                                                                                |
+| `use_max_bag_file_size`            | bool   | false                | If this is true, the bag files will be splitted into smaller sizes given in ```maximum_bag_file_size```. Otherwise, it will be splitted into 60 seconds durations. |
+| `maximum_bag_file_size`            | float  | 20.0                 | Maximum size (in GB) for each individual bag file.                                                                                                                 |
+| `enable_only_auto_mode_recording`  | bool   | false                | If enabled, recording occurs only when the vehicle is in "AUTO" mode.                                                                                              |
+| `number_of_maximum_bags`           | int    | 1000                 | Limit the number of stored bag files.                                                                                                                              |
+| `path`                             | string | `"bags/"`            | Path where bag files will be saved.                                                                                                                                |
+| `prefix`                           | string | `"logging_ros2bag_"` | Bag folder name prefix.                                                                                                                                            |
+| `minimum_acceptable_disk_space`    | int    | 10                   | Minimum acceptable disk space (in GB) before taking action.                                                                                                        |
+| `disk_space_threshold_action`      | string | `"shutdown"`         | Choose between `"remove"` or `"shutdown"` for disk space management.                                                                                               |
 
 ### Topic Parameters
 

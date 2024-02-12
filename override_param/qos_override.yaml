@@ -1,0 +1,161 @@
+/api/autoware/get/map/info/hash:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/external/get/map/info/hash:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/fail_safe/mrm_state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/localization/initialization_state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/motion/state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/operation_mode/state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/routing/route:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/api/routing/state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/control/vehicle_cmd_gate/is_paused:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/control/vehicle_cmd_gate/is_start_requested:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/planning/mission_planning/route:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/planning/mission_planning/route_marker:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/planning/mission_planning/route_state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/planning/scenario_planning/current_max_velocity:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/control:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/localization:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/map:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/perception:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/planning:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/sensing:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/system:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/autonomous/vehicle:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/control:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/localization:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/map:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/perception:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/planning:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/sensing:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/system:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/component_state_monitor/component/launch/vehicle:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/system/operation_mode/state:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+/tf_static:
+  depth: 1
+  durability: transient_local
+  history: keep_last
+  reliability: reliable
+

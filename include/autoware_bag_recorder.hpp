@@ -75,7 +75,6 @@ private:
   void check_disk_space();
   void check_record_time(
     const std::chrono::time_point<std::chrono::system_clock> & start_record_time);
-  void check_bag_size();
   void check_auto_mode();
   static std::string get_timestamp();
   rclcpp::QoS get_qos_profile_of_topic(const std::string & topic_name);
@@ -107,6 +106,7 @@ private:
 
   // parameters
   int maximum_record_time_;
+  bool use_max_bag_file_size_;
   double maximum_bag_file_size_;
   double maximum_allowed_bag_storage_size_;
   std::string database_storage_;

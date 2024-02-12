@@ -28,6 +28,8 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
   minimum_acceptable_disk_space_ =
     static_cast<int>(declare_parameter<int>("common.minimum_acceptable_disk_space"));
   maximum_record_time_ = static_cast<int>(declare_parameter<int>("common.maximum_record_time"));
+  use_max_bag_file_size_ =
+    static_cast<double>(declare_parameter<bool>("common.use_max_bag_file_size"));
   maximum_bag_file_size_ =
     static_cast<double>(declare_parameter<double>("common.maximum_bag_file_size"));
   maximum_allowed_bag_storage_size_ =
@@ -104,7 +106,13 @@ void AutowareBagRecorderNode::create_bag_file(
   rosbag2_storage::StorageOptions storage_options_new;
   storage_options_new.uri = bag_path;
   storage_options_new.storage_id = database_storage_;
-  storage_options_new.max_bagfile_duration = 60;
+  // Check if the user want to split w.r.t the size or duration
+  if(use_max_bag_file_size_){
+    storage_options_new.max_bagfile_size = maximum_bag_file_size_ * static_cast<std::uint64_t>(pow(1024.0, 3.0));
+  }else{
+    storage_options_new.max_bagfile_duration = 60;
+  }
+
   writer->open(storage_options_new);
 }
 
@@ -336,16 +344,12 @@ void AutowareBagRecorderNode::initialize_bag_files_for_topics()
 
 void AutowareBagRecorderNode::start_topic_search()
 {
-  std::thread([this]() {
-    rclcpp::Rate rate(100);
-    // if all topics are not subscribed, then continue checking
+
     while (remaining_topic_num_ > 0) {
       for (auto & section : module_sections_) {
         search_topic(section);
       }
-      rate.sleep();
     }
-  }).detach();
 }
 
 bool AutowareBagRecorderNode::is_acceptable_disk_limit_reached()
@@ -403,17 +407,6 @@ void AutowareBagRecorderNode::check_record_time(
   }
 }
 
-void AutowareBagRecorderNode::check_bag_size()
-{
-  for (auto & section : module_sections_) {
-    if (
-      get_bag_path_directory_size(std::filesystem::u8path(section.current_bag_name)) >
-      (maximum_bag_file_size_ * 1024)) {
-      bag_file_handler(section);
-    }
-  }
-}
-
 void AutowareBagRecorderNode::check_auto_mode()
 {
   if (!gate_mode_msg_ptr) {
@@ -445,9 +438,6 @@ void AutowareBagRecorderNode::start_status_control()
 
       // check record time limit
       check_record_time(start_record_time);
-
-      // check bag size limit
-      check_bag_size();
 
       // check autoware mode
       check_auto_mode();

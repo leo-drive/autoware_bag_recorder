@@ -458,9 +458,9 @@ void AutowareBagRecorderNode::run()
 {
 
   // Spin the node to discover the topics
-  rclcpp::Rate r(100);
+  rclcpp::Rate r(10);
   int i = 0;
-  while (rclcpp::ok() && i < 100) {
+  while (rclcpp::ok() && i < 450) {
     rclcpp::spin_some(node_);
     r.sleep();
     i++;

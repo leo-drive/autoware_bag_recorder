@@ -328,10 +328,7 @@ void AutowareBagRecorderNode::free_disk_space_for_continue(
 void AutowareBagRecorderNode::operation_mode_cmd_callback(
   const autoware_adapi_v1_msgs::msg::OperationModeState::ConstSharedPtr msg)
 {
-  operation_mode_msg_ptr_ = msg;  // AUTO = 1, EXTERNAL = 0
-  if (operation_mode_msg_ptr_->mode != autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS) {
-    is_writing_ = false;
-  }
+  operation_mode_msg_ptr_ = msg;  // AUTO = 0, STOP = 1, LOCAL = 2, REMOTE = 3
 }
 
 void AutowareBagRecorderNode::initialize_bag_files_for_topics()
@@ -420,6 +417,13 @@ void AutowareBagRecorderNode::check_auto_mode()
     operation_mode_msg_ptr_->mode == autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS;
   const bool should_write = enable_only_auto_mode_recording_ && !is_writing_;
 
+  if(!is_auto_mode && is_writing_){
+    for (auto & section : module_sections_) {
+      close_bag_file(section);
+    }
+    is_writing_ = false;
+  }
+
   if (is_auto_mode && should_write) {
     is_writing_ = true;
     for (auto & section : module_sections_) {
@@ -493,6 +497,11 @@ std::vector<std::string> AutowareBagRecorderNode::collect_topics(const std::vect
     }
   }
   return vector_topics;
+}
+void AutowareBagRecorderNode::close_bag_file(ModuleSection & section)
+{
+  std::lock_guard<std::mutex> lock(writer_mutex_);
+  section.bag_writer->close();
 }
 
 }  // namespace autoware_bag_recorder

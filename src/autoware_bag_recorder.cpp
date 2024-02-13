@@ -43,10 +43,11 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
   is_writing_ = false;
   remaining_topic_num_ = 0;
 
-  // create gate mode subscription
-  gate_mode_sub_ = create_subscription<tier4_control_msgs::msg::GateMode>(
-    "/control/current_gate_mode", 1,
-    std::bind(&AutowareBagRecorderNode::gate_mode_cmd_callback, this, std::placeholders::_1));
+  // create operation mode subscription
+  operation_mode_sub_ = create_subscription<autoware_adapi_v1_msgs::msg::OperationModeState>(
+    "/api/operation_mode/state", 1,
+    std::bind(
+        &AutowareBagRecorderNode::operation_mode_cmd_callback, this, std::placeholders::_1));
 
   // Check the files at initialization
   check_and_remove_files_at_init();
@@ -177,11 +178,12 @@ void AutowareBagRecorderNode::generic_subscription_callback(
   autoware_bag_recorder::ModuleSection & section)
 {
   // check autoware mode is arrived or not
-  if (!gate_mode_msg_ptr) {
+  if (!operation_mode_msg_ptr_) {
     return;
   }
 
-  const bool is_auto_mode = gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO;
+  const bool is_auto_mode =
+    operation_mode_msg_ptr_->mode == autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS;
   const bool should_record = !enable_only_auto_mode_recording_ || (is_auto_mode && is_writing_);
 
   if (should_record) {
@@ -323,11 +325,11 @@ void AutowareBagRecorderNode::free_disk_space_for_continue(
   directories.erase(directories.begin());
 }
 
-void AutowareBagRecorderNode::gate_mode_cmd_callback(
-  const tier4_control_msgs::msg::GateMode::ConstSharedPtr msg)
+void AutowareBagRecorderNode::operation_mode_cmd_callback(
+  const autoware_adapi_v1_msgs::msg::OperationModeState::ConstSharedPtr msg)
 {
-  gate_mode_msg_ptr = msg;  // AUTO = 1, EXTERNAL = 0
-  if (gate_mode_msg_ptr->data != tier4_control_msgs::msg::GateMode::AUTO) {
+  operation_mode_msg_ptr_ = msg;  // AUTO = 1, EXTERNAL = 0
+  if (operation_mode_msg_ptr_->mode != autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS) {
     is_writing_ = false;
   }
 }
@@ -409,12 +411,13 @@ void AutowareBagRecorderNode::check_record_time(
 
 void AutowareBagRecorderNode::check_auto_mode()
 {
-  if (!gate_mode_msg_ptr) {
-    RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1000, "The current gate mode not received!");
+  if (!operation_mode_msg_ptr_) {
+    RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1000, "The current operation mode not received!");
     return;
   }
 
-  const bool is_auto_mode = gate_mode_msg_ptr->data == tier4_control_msgs::msg::GateMode::AUTO;
+  const bool is_auto_mode =
+    operation_mode_msg_ptr_->mode == autoware_adapi_v1_msgs::msg::OperationModeState::AUTONOMOUS;
   const bool should_write = enable_only_auto_mode_recording_ && !is_writing_;
 
   if (is_auto_mode && should_write) {

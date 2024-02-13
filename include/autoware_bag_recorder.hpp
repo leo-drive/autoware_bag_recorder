@@ -88,6 +88,7 @@ private:
   void search_topic(ModuleSection & section);
   void create_bag_file(std::unique_ptr<rosbag2_cpp::Writer> & writer, const std::string & bag_path);
   void bag_file_handler(ModuleSection & section);
+  void close_bag_file(ModuleSection & section);
   static void add_topics_to_writer(
     std::unique_ptr<rosbag2_cpp::Writer> & writer_, std::string topic_name, std::string topic_type);
   void generic_subscription_callback(

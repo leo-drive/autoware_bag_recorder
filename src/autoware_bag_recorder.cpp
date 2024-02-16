@@ -489,7 +489,7 @@ std::vector<std::string> AutowareBagRecorderNode::collect_topics(const std::vect
   auto active_topics = node_->get_topic_names_and_types();
   // Iterate over topic list parameters to find their matches
   for(const auto & topic: topic_name){
-    std::regex regex_topic_name(topic);
+    std::regex regex_topic_name(topic,  std::regex_constants::ECMAScript | std::regex_constants::multiline);
     for(const auto &active_topic : active_topics){
       if (std::regex_search(active_topic.first, regex_topic_name)) {
         vector_topics.push_back(active_topic.first);

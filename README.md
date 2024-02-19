@@ -10,14 +10,17 @@
 
 The package subscribes to the following topics for input:
 
-| Name                         | Type                                | Description                                                                                           |
-| ---------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| `/control/current_gate_mode` | `tier4_control_msgs::msg::GateMode` | This topic is required for recording bag files when `enable_only_auto_mode_recording` is set to true. |
-| Any subscribed topic         | Any data type                       | Subscribe to any target topic that you want to save in a bag file.                                    |
+| Name                         | Type                                             | Description                                                                                           |
+| ---------------------------- |--------------------------------------------------| ----------------------------------------------------------------------------------------------------- |
+| `/api/operation_mode/state` | `autoware_adapi_v1_msgs::msg::OperationModeState` | This topic is required for recording bag files when `enable_only_auto_mode_recording` is set to true. |
+| Any subscribed topic         | Any data type                                    | Subscribe to any target topic that you want to save in a bag file.                                    |
 
 ### Output
 
-The `autoware_bag_recorder` package does not produce any output topics.
+
+| Name                            | Type                   | Description                                                                              |
+|---------------------------------|------------------------|------------------------------------------------------------------------------------------|
+| `/autoware_bag_recorder/status` | `std_msgs::msg::UInt8` | This topic represents the writing status of the recorder. 1: recording, 0: not recording |
 
 ## Parameters
 

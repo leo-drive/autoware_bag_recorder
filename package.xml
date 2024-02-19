@@ -16,6 +16,7 @@
   <depend>rosbag2_cpp</depend>
   <depend>rosbag2_storage</depend>
   <depend>autoware_adapi_v1_msgs</depend>
+  <depend>std_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

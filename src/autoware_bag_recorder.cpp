@@ -49,6 +49,9 @@ AutowareBagRecorderNode::AutowareBagRecorderNode(
     std::bind(
         &AutowareBagRecorderNode::operation_mode_cmd_callback, this, std::placeholders::_1));
 
+  recorder_status_pub_ = create_publisher<std_msgs::msg::UInt8>("/autoware_bag_recorder/status", 1);
+  timer_ = this->create_wall_timer(std::chrono::seconds(1), std::bind(&AutowareBagRecorderNode::timer_callback, this));
+
   // Check the files at initialization
   check_and_remove_files_at_init();
 
@@ -502,6 +505,19 @@ void AutowareBagRecorderNode::close_bag_file(ModuleSection & section)
 {
   std::lock_guard<std::mutex> lock(writer_mutex_);
   section.bag_writer->close();
+}
+void AutowareBagRecorderNode::timer_callback()
+{
+  std_msgs::msg::UInt8 status_msg{};
+
+  // Check if bag is written and publish the status
+  if(is_writing_){
+    status_msg.data = 1;
+  }else{
+    status_msg.data = 0;
+  }
+
+  recorder_status_pub_->publish(status_msg);
 }
 
 }  // namespace autoware_bag_recorder

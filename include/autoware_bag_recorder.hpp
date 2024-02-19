@@ -24,6 +24,7 @@
 #include <rosbag2_storage/storage_options.hpp>
 
 #include <autoware_adapi_v1_msgs/msg/operation_mode_state.hpp>
+#include <std_msgs/msg/u_int8.hpp>
 
 #include <sys/statfs.h>
 
@@ -104,6 +105,7 @@ private:
   void operation_mode_cmd_callback(const autoware_adapi_v1_msgs::msg::OperationModeState::ConstSharedPtr msg);
   void run();
   std::vector<std::string> collect_topics(const std::vector<std::string> &topic_name);
+  void timer_callback();
 
   // parameters
   int maximum_record_time_;
@@ -130,7 +132,9 @@ private:
 
   std::vector<rclcpp::SubscriptionBase::SharedPtr> subscriptions_;
   rclcpp::Subscription<autoware_adapi_v1_msgs::msg::OperationModeState>::ConstSharedPtr operation_mode_sub_;
+  rclcpp::Publisher<std_msgs::msg::UInt8>::SharedPtr recorder_status_pub_;
   rclcpp::Node::SharedPtr node_;
+  rclcpp::TimerBase::SharedPtr timer_;
 
   std::shared_ptr<rclcpp::SerializedMessage> serialized_msg_ptr_;
   autoware_adapi_v1_msgs::msg::OperationModeState::ConstSharedPtr operation_mode_msg_ptr_;

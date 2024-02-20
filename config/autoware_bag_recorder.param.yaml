@@ -72,7 +72,7 @@
         - ^/perception/object_recognition/detection/objects$
         - ^/perception/object_recognition/detection/rois(.*)$
         - ^/perception/object_recognition/prediction/maneuver$
-        - ^/perception/object_recognition/objects$$
+        - ^/perception/object_recognition/objects$
         - ^/perception/object_recognition/tracking/objects$
         - ^/perception/(.*)/traffic_signals$
         - ^/perception/(.*)/detection/rois$
